@@ -1,0 +1,34 @@
+---
+- name: Edit portsnap.conf
+  replace:
+    dest=/etc/portsnap.conf
+    regexp="{{ item.regexp }}"
+    replace="{{ item.replace }}"
+  with_items:
+    - regexp: '^#\s(REFUSE\s.*$)'
+      replace: '\1'
+  tags:
+    - ports
+
+
+- name: Fetch Ports Collection
+  command: /usr/sbin/portsnap --interactive fetch extract creates=/usr/ports
+  tags:
+    - ports
+
+
+- name: Check if ports need to update
+  shell: portsnap --interactive fetch | grep 'No updates needed'
+  register: port_update
+  changed_when: port_update.rc != 0
+  failed_when: False
+  tags:
+    - ports
+
+
+- name: Update Ports Collection
+  command: /usr/sbin/portsnap --interactive fetch update
+  when: port_update.rc != 0
+  tags:
+    - ports
+
