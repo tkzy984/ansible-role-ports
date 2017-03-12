@@ -7,14 +7,10 @@
   with_items:
     - regexp: '^#\s(REFUSE\s.*$)'
       replace: '\1'
-  tags:
-    - ports
 
 
 - name: Fetch Ports Collection
   command: /usr/sbin/portsnap --interactive fetch extract creates=/usr/ports
-  tags:
-    - ports
 
 
 - name: Check if ports need to update
@@ -22,13 +18,9 @@
   register: port_update
   changed_when: port_update.rc != 0
   failed_when: False
-  tags:
-    - ports
 
 
 - name: Update Ports Collection
   command: /usr/sbin/portsnap --interactive fetch update
   when: port_update.rc != 0
-  tags:
-    - ports
 
